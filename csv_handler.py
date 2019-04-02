@@ -16,6 +16,8 @@ def get_points_from_csv(file_path='C:/Users\Shahar Haskor\PycharmProjects\cheat_
 def get_range(points):
     range_dict = {'max_x': points[0].get_x(), 'min_x': points[0].get_x(),
                   'max_y': points[0].get_y(), 'min_y': points[0].get_y(), 'num_points': 0}
+    
+    range_dict['num_points'] = len(points)
     for point in points:
         if point.get_x() > range_dict.get('max_x'):
             range_dict['max_x'] = point.get_x()
