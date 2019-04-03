@@ -7,6 +7,7 @@ from bokeh.io import show
 import numpy as np
 
 import csv_handler
+import point_handler
 
 
 def PolyCoefficients(range_x, coeffs):
@@ -74,12 +75,19 @@ def button2csv():
 output_file("cheat_gui.html")
 
 points = csv_handler.get_points_from_csv()
-dots_range = csv_handler.get_range(points)
+dots_range = point_handler.Point.get_range(points)
 
+tools = ["pan", "box_select", "wheel_zoom", "reset"]
 p = figure(x_range=(int(dots_range['min_x'])-1, int(dots_range['max_x'])+1),
-           y_range=(int(dots_range['min_y'])-1, int(dots_range['max_y'])+1), tools=[],
+           y_range=(int(dots_range['min_y'])-1, int(dots_range['max_y'])+1), tools=tools,
            title='cheat_gui')
 p.background_fill_color = 'lightgrey'
+
+coeffs = [1, 2]
+dots_x_line, dots_y_line, dots_color_line = poly_values(dots_range, coeffs)
+line_color = csv_handler.get_line_color_from_csv()
+line_size = csv_handler.get_line_size_from_csv()
+p.line(dots_x_line, dots_y_line, line_width=line_size, color=line_color)
 
 dots_x = []
 dots_y = []
@@ -88,13 +96,6 @@ for point in points:
     dots_x.append(point.get_x())
     dots_y.append(point.get_y())
     dots_color.append(point.get_color())
-
-
-coeffs = [1, 2]
-dots_x_line, dots_y_line, dots_color_line = poly_values(dots_range, coeffs)
-dots_x += dots_x_line
-dots_y += dots_y_line
-dots_color += dots_color_line
 
 source = ColumnDataSource({
     'x': dots_x, 'y': dots_y, 'color': dots_color
