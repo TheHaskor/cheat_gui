@@ -5,6 +5,7 @@ from bokeh.models.widgets import Button
 from bokeh.io import show
 
 import numpy as np
+import sys
 
 import csv_handler
 import point_handler
@@ -23,7 +24,7 @@ def PolyCoefficients(range_x, coeffs):
 
 
 def poly_values(dots_range, coeffs):
-    range_x = np.linspace(dots_range['min_x'], dots_range['max_x'], dots_range['num_points']*100)
+    range_x = np.linspace(dots_range['min_x'] - 100, dots_range['max_x'] + 100, dots_range['num_points']*100)
     dots_x = range_x.tolist()
     dots_y = list(PolyCoefficients(range_x, coeffs))
     return dots_x, dots_y
@@ -82,7 +83,8 @@ p = figure(x_range=(int(dots_range['min_x'])-1, int(dots_range['max_x'])+1),
            title='cheat_gui')
 p.background_fill_color = 'lightgrey'
 
-coeffs = [1, 2]
+coeffs = sys.argv[1:]
+coeffs = [float(c) for c in coeffs]
 dots_x_line, dots_y_line = poly_values(dots_range, coeffs)
 line_color = csv_handler.get_line_color_from_csv()
 line_size = csv_handler.get_line_size_from_csv()
@@ -101,7 +103,7 @@ source = ColumnDataSource({
 })
 
 
-renderer = p.scatter(x='x', y='y', source=source, color='color', size=10)
+renderer = p.scatter(x='x', y='y', source=source, color='color', size=csv_handler.get_point_size_from_csv())
 columns = [TableColumn(field="x", title="x"),
            TableColumn(field="y", title="y"),
            TableColumn(field='color', title='color')]
