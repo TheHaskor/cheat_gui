@@ -26,8 +26,7 @@ def poly_values(dots_range, coeffs):
     range_x = np.linspace(dots_range['min_x'], dots_range['max_x'], dots_range['num_points']*100)
     dots_x = range_x.tolist()
     dots_y = list(PolyCoefficients(range_x, coeffs))
-    dots_color = ['green' for x in range(len(dots_x))]
-    return dots_x, dots_y, dots_color
+    return dots_x, dots_y
 
 
 def button2csv():
@@ -84,7 +83,7 @@ p = figure(x_range=(int(dots_range['min_x'])-1, int(dots_range['max_x'])+1),
 p.background_fill_color = 'lightgrey'
 
 coeffs = [1, 2]
-dots_x_line, dots_y_line, dots_color_line = poly_values(dots_range, coeffs)
+dots_x_line, dots_y_line = poly_values(dots_range, coeffs)
 line_color = csv_handler.get_line_color_from_csv()
 line_size = csv_handler.get_line_size_from_csv()
 p.line(dots_x_line, dots_y_line, line_width=line_size, color=line_color)
