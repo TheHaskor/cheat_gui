@@ -5,6 +5,7 @@ from bokeh.models.widgets import Button
 from bokeh.io import show
 
 import numpy as np
+from scipy.stats import chisquare
 import sys
 
 import csv_handler
@@ -28,6 +29,15 @@ def poly_values(dots_range, coeffs):
     dots_x = range_x.tolist()
     dots_y = list(PolyCoefficients(range_x, coeffs))
     return dots_x, dots_y
+
+
+def no_zeroes(list_with_zeroes):
+    list_withot_zeroes = []
+    for a in list_with_zeroes:
+        if a == 0:
+            a += 0.01
+        list_withot_zeroes.append(a)
+    return list_withot_zeroes
 
 
 def button2csv():
@@ -102,6 +112,18 @@ source = ColumnDataSource({
     'x': dots_x, 'y': dots_y, 'color': dots_color
 })
 
+y_for_expected = [PolyCoefficients(i, [0, 4, 3]) for i in dots_x]
+dots_y_without_zeroes = no_zeroes(dots_y)
+y_for_expected_without_zeroes = no_zeroes(y_for_expected)
+chi, propability = chisquare(dots_y_without_zeroes, f_exp=y_for_expected_without_zeroes)
+fit_source = ColumnDataSource({
+    'chi_squared': [chi],
+    'p_propabilty': [propability]
+})
+columns_for_fit = [TableColumn(field="chi_squared", title="chi_squared"),
+           TableColumn(field="p_propabilty", title="p_propabilty")]
+table_fit = DataTable(source=fit_source, columns=columns_for_fit, editable=True, height=50)
+show(table_fit)
 
 renderer = p.scatter(x='x', y='y', source=source, color='color', size=csv_handler.get_point_size_from_csv())
 columns = [TableColumn(field="x", title="x"),
@@ -109,11 +131,13 @@ columns = [TableColumn(field="x", title="x"),
            TableColumn(field='color', title='color')]
 table = DataTable(source=source, columns=columns, editable=True, height=200)
 
+
 draw_tool = PointDrawTool(renderers=[renderer], empty_value='black')
 p.add_tools(draw_tool)
 p.toolbar.active_tap = draw_tool
 
 show(Column(p, table))
+
 
 button2csv()
 
